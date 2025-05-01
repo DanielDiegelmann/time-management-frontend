@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+//client/src/App.tsx
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import TaskDashboard from './TaskDashboard'; // your existing tasks view component
+import Dashboard from './Dashboard';         // our new analytics dashboard
+import ProjectDashboard from './ProjectDashboard';
+import ActivityDashboard from './ActivityDashboard';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function Navigation() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <nav className="main-nav">
+      <ul>
+        <li><Link to="/">Tasks</Link></li>
+        <li><Link to="/dashboard">Analytics</Link></li>
+        <li><Link to="/projects">Projects</Link></li>
+        <li><Link to="/activities">Activities</Link></li>
+      </ul>
+    </nav>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <Router>
+      <div className="app-container">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<TaskDashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/projects" element={<ProjectDashboard />} />
+          <Route path="/activities" element={<ActivityDashboard />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+export default App;

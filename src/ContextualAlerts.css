@@ -1,0 +1,51 @@
+.contextual-alerts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .alert-card {
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+  }
+  
+  .alert-card h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .alert-card p {
+    font-size: 1.25rem;
+    margin: 0;
+    color: #007bff;
+  }
+  
+  .view-more {
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .view-more a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #0056b3;
+    border: 1px solid #0056b3;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+  }
+  
+  .view-more a:hover {
+    background: #0056b3;
+    color: #fff;
+  }
+  

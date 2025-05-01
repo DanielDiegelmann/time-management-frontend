@@ -1,0 +1,10 @@
+.dashboard-container {
+    padding: 1rem;
+  }
+  
+  .projects-list {
+    display: block;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  

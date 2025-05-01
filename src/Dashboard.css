@@ -1,0 +1,81 @@
+.dashboard {
+    padding: 1rem;
+  }
+  
+  .dashboard h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .dashboard-filters {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-filters label {
+    font-size: 0.9rem;
+  }
+  
+  .dashboard-filters input {
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.25rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  
+  .card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .card h3 {
+    margin-top: 0;
+  }
+  
+  .insights {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  
+  .alert {
+    background: #ffdddd;
+    padding: 0.75rem;
+    border: 1px solid #ff5c5c;
+    border-radius: 4px;
+    color: #a94442;
+    font-size: 0.9rem;
+  }
+  .granularity-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .granularity-toggle button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #007bff;
+    background: #fff;
+    color: #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  
+  .granularity-toggle button.active,
+  .granularity-toggle button:hover {
+    background: #007bff;
+    color: #fff;
+  }
+    

@@ -1,0 +1,127 @@
+/* Path: client/src/ProjectCard.css
+   Updated: 2025-03-08 11:45:00
+   Modern, fun, and progressive styles for project cards with dotted options and repositioned drag handle */
+
+   .project-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.8rem;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .project-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .project-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+    flex: 1;
+  }
+  
+  .options-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .options-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+    padding: 0.2rem;
+  }
+  
+  .options-dropdown {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+  }
+  
+  .options-dropdown button {
+    display: block;
+    color:#333;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .options-dropdown button:hover {
+    background: #f7f7f7;
+  }
+  
+  .expand-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  /* Drag handle repositioned to right with two lines */
+  .drag-handle {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    cursor: grab;
+    margin-left: auto;
+  }
+  .drag-handle::before,
+  .drag-handle::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #888;
+  }
+  
+  .project-body {
+    padding-top: 0.5rem;
+  }
+  
+  .add-task button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+}
+
+.add-task button:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+}
+
+  
+  .tasks-list {
+    margin-top: 0.75rem;
+  }
+  

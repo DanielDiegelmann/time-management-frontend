@@ -1,0 +1,144 @@
+/* PomodoroWidget.css */
+.pomodoro-widget-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+  
+  /* The hovering button (tomato icon) */
+  .pomodoro-open-btn {
+    background: #ff6347; /* Tomato color */
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+  }
+  
+  .pomodoro-open-btn:hover {
+    transform: scale(1.1);
+  }
+  
+  .pomodoro-open-btn img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Modal overlay */
+  .pomodoro-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+  }
+  
+  /* Modal content */
+  .pomodoro-modal {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    border-radius: 15px;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .pomodoro-modal h2 {
+    margin-bottom: 15px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  
+  .pomodoro-settings label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .pomodoro-settings input {
+    width: 60px;
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    margin-left: 5px;
+  }
+  
+  .timer-display {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 20px 0;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  
+  .timer-controls button {
+    background: #ff6347;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease;
+  }
+  
+  .timer-controls button:hover {
+    background: #e5533d;
+  }
+  
+  .timer-controls button.secondary {
+    background: #ddd;
+    color: #333;
+  }
+  
+  .timer-controls button.secondary:hover {
+    background: #ccc;
+  }
+  
+  .pomodoro-modal p {
+    margin: 10px 0;
+    font-style: italic;
+  }
+  
+  .close-modal {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-top: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .close-modal:hover {
+    background: #555;
+  }
+  
+  /* Minimized view when the modal is closed but timer is running */
+  .pomodoro-minimized {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #ff6347;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    z-index: 1050;
+  }
+  
+  .pomodoro-minimized .tomato-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+  }
+  

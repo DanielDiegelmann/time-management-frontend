@@ -1,0 +1,141 @@
+/* Path: client/src/ActivityCard.css
+   Updated: 2025-03-08 11:45:00
+   Modern, fun, and progressive styles with dotted options and repositioned drag handle */
+
+   .activity-card {
+    background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.2rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .activity-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #f0e6da;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Remove aggregated time display */
+  
+  /* Options button container */
+  .options-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .options-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+    padding: 0.2rem;
+  }
+  
+  .options-dropdown {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+  }
+  
+  .options-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .options-dropdown button:hover {
+    background: #f7f7f7;
+  }
+  
+  .activity-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #5a3e36;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    flex: 1;
+  }
+  
+  /* Drag handle repositioned to right with two lines */
+  .drag-handle {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    cursor: grab;
+    margin-left: auto;
+  }
+  .drag-handle::before,
+  .drag-handle::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #888;
+  }
+
+  
+  .expand-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: #d35400;
+    transition: color 0.2s;
+  }
+  
+  .expand-btn:hover {
+    color: #b03a2e;
+  }
+  
+  .activity-body {
+    padding-top: 0.5rem;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .add-project button {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-weight: bold;
+  }
+  
+  .add-project button:hover {
+    background: linear-gradient(135deg, #f56991, #f7c6b7);
+  }
+  
+  .projects-list {
+    margin-top: 0.75rem;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
