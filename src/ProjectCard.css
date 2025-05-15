@@ -3,8 +3,8 @@
    Modern, fun, and progressive styles for project cards with dotted options and repositioned drag handle */
 
    .project-card {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: #D1Ad1ac0;
+    border: 1px solid #000;
     border-radius: 8px;
     padding: 0.8rem;
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
@@ -21,7 +21,7 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #000;
     padding-bottom: 0.5rem;
     margin-bottom: 0.5rem;
   }
@@ -29,7 +29,7 @@
   .project-header h4 {
     margin: 0;
     font-size: 1.1rem;
-    color: #333;
+    color: #000;
     flex: 1;
   }
   
@@ -43,7 +43,7 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #888;
+    color: #000 !important;
     padding: 0.2rem;
   }
   
@@ -125,3 +125,6 @@
     margin-top: 0.75rem;
   }
   
+  .project-card p {
+    color: #000 !important;
+  }

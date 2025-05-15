@@ -353,7 +353,7 @@ export default function ActivityDashboard() {
       {/* Pomodoro Timer Widget */}
       <PomodoroWidget />
       <div className="add-activity">
-        <button onClick={() => setShowAddActivityModal(true)}>Add Activity</button>
+        <button onClick={() => setShowAddActivityModal(true)}>New Activity</button>
       </div>
       {showAddActivityModal && (
         <AddActivityModal

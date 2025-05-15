@@ -4,8 +4,7 @@
     gap: 1rem;
     margin-bottom: 1.5rem;
     justify-content: center;
-    background: #fff;
-    border: 1px solid #ddd;
+    background: #000;
     border-radius: 6px;
     padding: 1rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -13,19 +12,25 @@
   
   .alert-card {
     flex: 1;
+    background-color: #D1Ad1ac0; /* Secondary Gold */
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(209, 172, 0, 0.2); /* Secondary Gold shadow */
     min-width: 150px;
     text-align: center;
   }
   
   .alert-card h4 {
     margin-bottom: 0.5rem;
-    font-size: 1rem;
+    color: #000; /* Primary Yellow */
+    font-weight: bold;
+    font-size: 1.2rem;
   }
   
   .alert-card p {
-    font-size: 1.25rem;
+    font-size: 2.25rem;
+    color: #FFD500;
     margin: 0;
-    color: #007bff;
   }
   
   .view-more {
@@ -37,10 +42,11 @@
   .view-more a {
     text-decoration: none;
     font-weight: bold;
-    color: #0056b3;
-    border: 1px solid #0056b3;
+    color: #FFD500; /* Primary Yellow */
+    background: transparent;
+    border: 1px solid #FFD500;
     padding: 0.5rem 1rem;
-    border-radius: 4px;
+    border-radius: 12px;
     transition: background 0.2s, color 0.2s;
   }
   
