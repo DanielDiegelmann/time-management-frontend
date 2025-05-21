@@ -3,17 +3,16 @@
    Modern, fun, and cohesive styles for task cards with green gradient buttons and unified font */
 
    .task-card {
-    background: linear-gradient(135deg, #fdfbfb, #ebedee);
-    border: 1px solid #ddd;
+    background: #222;
+    border-left: solid 2px #ffd500;
     border-radius: 8px;
+    padding: 0.8rem;
     margin-bottom: 1rem;
-    padding: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   
   .task-card:hover {
+    background: #333;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
   
@@ -29,8 +28,8 @@
   
   .task-header h3 {
     margin: 0;
-    font-size: 1.3rem;
-    color: #333;
+    font-size: 1rem;
+    color: #fff;
     flex: 1;
   }
   
@@ -111,6 +110,7 @@
   
   .expand-btn {
     background: transparent;
+    display: none;  
     border: none;
     font-size: 1.5rem;
     cursor: pointer;

@@ -12,24 +12,30 @@
   
   .alert-card {
     flex: 1;
-    background-color: #D1Ad1ac0; /* Secondary Gold */
-    border-radius: 6px;
+    background-color: #000; /* Secondary Gold */
+    border-radius: 12px;
     padding: 1rem;
-    box-shadow: 0 4px 8px rgba(209, 172, 0, 0.2); /* Secondary Gold shadow */
     min-width: 150px;
     text-align: center;
+    border: 2px solid #FFD500; /* Primary Yellow */
+  }
+
+  .alert-card:hover {
+    background: #111; /* Darker background on hover */
+    box-shadow: 0 4px 8px rgba(209, 172, 0, 0.2); /* Shadow in Secondary Gold */
+    transition: background 0.2s, box-shadow 0.2s;
   }
   
   .alert-card h4 {
     margin-bottom: 0.5rem;
-    color: #000; /* Primary Yellow */
+    color: #FFD500; /* Primary Yellow */
     font-weight: bold;
     font-size: 1.2rem;
   }
   
   .alert-card p {
     font-size: 2.25rem;
-    color: #FFD500;
+    color: #fff;
     margin: 0;
   }
   
@@ -44,14 +50,13 @@
     font-weight: bold;
     color: #FFD500; /* Primary Yellow */
     background: transparent;
-    border: 1px solid #FFD500;
+    border: 2px solid #FFD500;
     padding: 0.5rem 1rem;
     border-radius: 12px;
     transition: background 0.2s, color 0.2s;
   }
   
   .view-more a:hover {
-    background: #0056b3;
-    color: #fff;
+    background: #111;
   }
   

@@ -14,6 +14,7 @@
 }
 
 .activity-card:hover {
+  background: #111;
   box-shadow: 0 6px 12px rgba(209, 172, 0, 0.3);
 }
 
@@ -23,17 +24,17 @@
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  border-bottom: 1px solid #FFD500;  /* Using Primary Yellow as subtle divider */
+  border-bottom: 2px solid #FFD500;  /* Using Primary Yellow as subtle divider */
   padding-bottom: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 .activity-header h3 {
   margin: 0;
-  font-size: 1.3rem; /* Adjust as needed */
+  font-size: 1.5rem; /* Adjust as needed */
   font-family: 'Inter', sans-serif;
-  font-weight: 600;  /* Inter Semi-Bold */
-  color: #FFFFFF;    /* Main text: White */
+  font-weight: 800;  /* Inter Semi-Bold */
+  color: #ffd500;    /* Main text: White */
   line-height: 24px; /* Section label line-height */
   flex: 1;
 }
@@ -49,7 +50,7 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #FFFFFF;   /* White icons on dark background */
+  color: #FFD500;   /* White icons on dark background */
   padding: 0.2rem;
 }
 
