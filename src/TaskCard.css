@@ -1,253 +1,310 @@
-/* Path: client/src/TaskCard.css
-   Updated: 2025-03-08 12:30:00
-   Modern, fun, and cohesive styles for task cards with green gradient buttons and unified font */
+/* ────────────────────────────────────────────────────────────
+   TaskCard.css
+   Modern “pill” panels, neon-chalk accents & smooth hover effects
+───────────────────────────────────────────────────────────── */
 
-   .task-card {
-    background: #222;
-    border-left: solid 2px #ffd500;
-    border-radius: 8px;
-    padding: 0.8rem;
-    margin-bottom: 1rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .task-card:hover {
-    background: #333;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-  
-  .task-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .task-header h3 {
-    margin: 0;
-    font-size: 1rem;
-    color: #fff;
-    flex: 1;
-  }
-  
-  .status-display {
-    font-size: 0.9rem;
-    color: #555;
-    margin-left: 1rem;
-  }
-  
-  .status-display span {
-    margin-right: 0.5rem;
-  }
-  
-  .options-container {
-    position: relative;
-    display: inline-block;
-    margin-left: 0.5rem;
-  }
-  
-  .options-btn {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #888;
-    padding: 0.2rem;
-  }
-  
-  .options-dropdown {
-    position: absolute;
-    top: 110%;
-    right: 0;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 10;
-  }
-  
-  .options-dropdown button {
-    display: block;
-    width: 100%;
-    padding: 0.5rem 1rem;
-    background: transparent;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  .options-dropdown button:hover {
-    background: #f7f7f7;
-  }
-  
-  .drag-handle {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    position: relative;
-    cursor: grab;
-    margin-left: auto;
-  }
-  .drag-handle::before,
-  .drag-handle::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: #888;
-  }
-  .drag-handle::before {
-    top: 30%;
-  }
-  .drag-handle::after {
-    top: 60%;
-  }
-  
-  .expand-btn {
-    background: transparent;
-    display: none;  
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-  
-  .task-body {
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  
-  .task-description {
-    margin-bottom: 1rem;
-    color: #444;
-  }
-  
-  .actions {
-    margin-bottom: 1rem;
-  }
-  
-  /* Green gradient for primary action buttons */
-  .actions button:not(.secondary) {
-    background: linear-gradient(135deg, #a1e887, #28a745);
-    border: none;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    margin-right: 0.5rem;
-    cursor: pointer;
-    transition: background 0.2s;
-    color: #fff;
-    font-weight: bold;
-  }
-  
-  .actions button:not(.secondary):hover {
-    background: linear-gradient(135deg, #8ec06c, #218838);
-  }
-  
-  /* Secondary buttons use a solid dark green */
-  .actions button.secondary {
-    background: #6c757d;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  .actions button.secondary:hover {
-    background: #5a6268;
-  }
-  
-  .progress-toggle {
-    margin: 0.8rem 0;
-    padding: 0.5rem;
-    background: #e9f7ef;
-    border: 1px solid #c3e6cb;
-    border-radius: 4px;
-  }
-  
-  .progress-toggle span {
-    font-weight: bold;
-    margin-right: 0.5rem;
-    color: #155724;
-  }
-  
-  .progress-toggle label {
-    margin-right: 0.5rem;
-    font-size: 0.9rem;
-    color: #155724;
-  }
+/* card container */
+.task-card {
+  background: #111;                           /* deep chalkboard black */
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border-left: solid 2px #ffd500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  transition: transform 0.25s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
+}
 
-  .working-toggle span {
-    font-weight: bold;
-    color: #0d6efd;
-  }
-  
-  .working-toggle {
-    margin-top: 0.8rem;
-    padding: 0.5rem;
-    background: #e2f0fb;
-    border: 1px solid #a6d8ff;
-    border-radius: 4px;
-  }
-  
-  .working-toggle label {
-    margin-right: 0.5rem;
-    font-size: 0.9rem;
-    color: #0d6efd;
-  }
-  
-  .detailed-section {
-    margin-top: 1rem;
-  }
-  
-  .notes-list,
-  .timer-list,
-  .logs-list {
-    list-style: none;
-    padding-left: 1rem;
-    margin: 0;
-  }
-  
-  /* Fun goal-setting styles */
-  .rounds-goal {
-    margin-top: 1rem;
-    padding: 0.5rem;
-    background: linear-gradient(135deg, #fff5e6, #ffe6cc);
-    border: 1px solid #ffcc80;
-    border-radius: 6px;
-  }
-  
-  .rounds-control, .goal-control {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-  }
-  
-  .rounds-control span {
-    font-weight: bold;
-    margin-right: 0.5rem;
-    color: #d35400;
-  }
-  
-  .goal-control button, 
-  .goal-control select, 
-  .goal-control input {
-    margin-right: 0.5rem;
-    padding: 0.3rem 0.6rem;
-    border: 1px solid #ffcc80;
-    border-radius: 4px;
-    background: #fff8f0;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #d35400;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
+/* subtle lift on hover */
+.task-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.8);
+}
+
+/* header row */
+.task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #222;
+}
+
+/* title text */
+.task-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* status & progress tag */
+.status-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #bbb;
+}
+
+/* working / progress pills */
+.status-display span {
+  position: relative;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.05);
+  transition: background 0.3s, color 0.3s;
+}
+.status-display span[data-label="working-status"] {
+  color: #1e90ff;
+}
+.status-display span[data-label="progress-status"] {
+  color: #28a745;
+}
+.task-card:hover .status-display span {
+  background: rgba(255,255,255,0.1);
+}
+
+/* drag handle “pill” anchor */
+.drag-handle {
+  cursor: grab;
+  width: 1.25rem;
+  height: 1.25rem;
+  position: relative;
+  margin-left: 0.75rem;
+}
+.drag-handle::before,
+.drag-handle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #555;
+}
+.drag-handle::before { top: 30%; }
+.drag-handle::after  { top: 60%; }
+
+/* expand / collapse chevron */
+.expand-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.expand-btn:hover {
+  color: #fff;
+}
+
+/* body content fade-in */
+.task-body {
+  animation: fadeIn 0.3s ease-out;
+  margin-top: 1rem;
+  color: #ddd;
+  line-height: 1.4;
+}
+
+/* description text */
+.task-description {
+  margin-bottom: 1rem;
+  font-style: italic;
+  color: #aaa;
+}
+
+/* action buttons row */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* primary action pills */
+.actions button:not(.secondary) {
+  background: linear-gradient(135deg, #8fde7d, #28a745);
+  border: none;
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.actions button:not(.secondary):hover {
+  background: linear-gradient(135deg, #6ec15a, #218838);
+  transform: translateY(-2px);
+}
+
+/* secondary (destructive or less-emphatic) pills */
+.actions button.secondary {
+  background: #444;
+  color: #eee;
+  border: 1px solid #555;
+}
+.actions button.secondary:hover {
+  background: #555;
+}
+
+/* the “live timer” & detailed-sections share a pill style */
+.working-toggle,
+.progress-toggle {
+  background: rgba(30,144,255,0.1);
+  border-left: 4px solid #1e90ff;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: #fff;
+  font-weight: 500;
+}
+.progress-toggle {
+  background: rgba(40,167,69,0.1);
+  border-color: #28a745;
+}
+
+/* notes, logs, time-entries lists */
+.notes-list,
+.timer-list,
+.logs-list {
+  list-style: none;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+}
+.notes-list li,
+.timer-list li,
+.logs-list li {
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+.notes-list li::before,
+.timer-list li::before,
+.logs-list li::before {
+  content: '•';
+  position: absolute;
+  left: -1rem;
+  color: #28a745;
+}
+
+/* goal & rounds panel */
+/* ───────────────────────────────────────────────
+   Rounds-Goal Redesign
+──────────────────────────────────────────────── */
+.rounds-goal {
+  background: #1a1a1a;
+  border: 2px dashed #ff8c00;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin-top: 1.5rem;
+  position: relative;
+  color: #ffb74d;
+  box-shadow: inset 0 0 8px rgba(255,183,77,0.2);
+}
+
+.rounds-goal .label {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: block;
+  color: #ffb74d;
+}
+
+.rounds-control {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.rounds-control .count {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.rounds-control button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid #28a745;
+  background: transparent;
+  color: #28a745;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 
+    background 0.3s,
+    color 0.3s,
+    transform 0.2s,
+    box-shadow 0.3s;
+  box-shadow: 0 0 4px rgba(40,167,69,0.4);
+}
+.rounds-control button:hover {
+  background: #28a745;
+  color: #111;
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(40,167,69,0.6);
+}
+
+/* Set Goal button */
+.set-goal-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #42a5f5, #1e88e5);
+  color: #fff;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: 
+    background 0.3s,
+    box-shadow 0.3s,
+    transform 0.2s;
+  box-shadow: 0 4px 12px rgba(30,136,229,0.4);
+}
+.set-goal-btn:hover {
+  background: linear-gradient(135deg, #1e88e5, #1565c0);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(30,136,229,0.6);
+}
+
+/* View History link styled as neon pill */
+.goal-history-btn {
+  margin-top: 0.75rem;
+}
+.goal-history-btn button {
+  background: none;
+  border: 2px solid #ff8c00;
+  color: #ff8c00;
+  padding: 0.4rem 1rem;
+  border-radius: 2rem;
+  font-weight: 600;
+  transition: 
+    background 0.3s,
+    color 0.3s,
+    box-shadow 0.3s;
+  box-shadow: 0 0 6px rgba(255,140,0,0.4);
+  cursor: pointer;
+}
+.goal-history-btn button:hover {
+  background: #ff8c00;
+  color: #1a1a1a;
+  box-shadow: 0 0 12px rgba(255,140,0,0.7);
+}
+
+/* fadeIn animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* small-screen tweak */
+@media (max-width: 600px) {
+  .actions { justify-content: center; }
+  .task-card { padding: 0.75rem; }
+  .task-header h3 { font-size: 0.95rem; }
+}

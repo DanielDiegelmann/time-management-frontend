@@ -14,8 +14,7 @@
 }
 
 .activity-card:hover {
-  background: #111;
-  box-shadow: 0 6px 12px rgba(209, 172, 0, 0.3);
+  box-shadow: 0 6px 12px rgba(209, 172, 0, 0.9);
 }
 
 /* Activity Header – Section Labels */

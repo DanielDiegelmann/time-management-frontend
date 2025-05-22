@@ -251,3 +251,77 @@ body {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.main-nav {
+  position: sticky;
+  top: 1rem;                     /* floats 1rem below top */
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;          /* allow clicks only on links */
+}
+
+.main-nav ul {
+  display: inline-flex;
+  gap: 1rem;
+  background: #ffd50081;
+  backdrop-filter: blur(10px);
+  padding: 0.25rem;
+  border-radius: 9999px;
+  list-style: none;
+  margin: 0;
+  pointer-events: all;           /* re-enable on children */
+}
+
+/* Each tab */
+.nav-link {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  color: #222;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 9999px;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #000;
+}
+
+/* “Background pill” behind the active tab */
+.nav-link.active {
+  color: #000;
+  font-weight: 600;
+}
+
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #FFDD00;           /* your accent */
+  border-radius: inherit;
+  z-index: -1;
+  transition: transform 0.3s;    /* gliding effect */
+}
+
+/* Slide the pill smoothly if you change tabs */
+.nav-link::before {
+  transform: scaleX(0);
+}
+.nav-link.active::before {
+  transform: scaleX(1);
+}
+
+/* Mobile / responsiveness */
+@media (max-width: 600px) {
+  .main-nav {
+    padding: 0 0.5rem;
+  }
+  .main-nav ul {
+    gap: 0.5rem;
+  }
+}

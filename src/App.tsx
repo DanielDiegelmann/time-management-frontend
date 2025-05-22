@@ -6,19 +6,36 @@ import Dashboard from './Dashboard';         // our new analytics dashboard
 import ProjectDashboard from './ProjectDashboard';
 import ActivityDashboard from './ActivityDashboard';
 import './App.css';
+import { NavLink } from 'react-router-dom';
 
 function Navigation() {
+  const tabs = [
+    { to: '/', label: 'Tasks' },
+    { to: '/dashboard', label: 'Analytics' },
+    { to: '/projects', label: 'Projects' },
+    { to: '/activities', label: 'Activities' },
+  ];
+
   return (
     <nav className="main-nav">
       <ul>
-        <li><Link to="/">Tasks</Link></li>
-        <li><Link to="/dashboard">Analytics</Link></li>
-        <li><Link to="/projects">Projects</Link></li>
-        <li><Link to="/activities">Activities</Link></li>
+        {tabs.map(({ to, label }) => (
+          <li key={to}>
+            <NavLink
+              to={to}
+              className={({ isActive }) =>
+                `nav-link${isActive ? ' active' : ''}`
+              }
+            >
+              {label}
+            </NavLink>
+          </li>
+        ))}
       </ul>
     </nav>
   );
 }
+
 
 function App() {
   return (
