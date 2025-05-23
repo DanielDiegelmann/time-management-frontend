@@ -55,6 +55,12 @@
   gap: 1rem;
 }
 
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 12px;
+  }
+}
+
 /* 
   Note: For inputs and labels across the app, consider adding rules such as:
     - font: Inter Regular (14px) for body text/inputs 

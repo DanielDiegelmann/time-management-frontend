@@ -162,7 +162,7 @@ export default function ProjectCard({
 
   return (
     <div className="project-card" data-label="project-card">
-      <div className="project-header">
+      <div className={`project-header ${isExpanded ? "expanded" : ""}`}>
         <div className="options-container">
           <button className="options-btn" onClick={() => setShowOptions(!showOptions)}>
             ⋮

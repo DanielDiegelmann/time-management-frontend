@@ -118,7 +118,7 @@ export default function ActivityCard({
 
   return (
     <div className="activity-card" data-label="activity-card">
-      <div className="activity-header">
+      <div className={`activity-header ${isExpanded ? "expanded" : ""}`}>
         {/* Options button for Edit/Delete */}
         <div className="options-container">
           <button className="options-btn" onClick={() => setShowOptions(!showOptions)}>
@@ -136,7 +136,6 @@ export default function ActivityCard({
           )}
         </div>
         <h3 onClick={() => setIsExpanded(!isExpanded)}>{activity.title}</h3>
-        {/* Drag handle moved to right */}
         <span className="drag-handle" {...dragHandleProps}></span>
       </div>
       {showEditActivityModal && (

@@ -291,7 +291,7 @@ const handleAssign = async (taskId: string, projectId: string) => {
 
   return (
     <div className="task-card">
-      <div className="task-header">
+      <div className={`task-header ${isExpanded ? "expanded" : ""}`}>
         {/* Options button on the far left */}
         <div className="options-container">
           <button className="options-btn" onClick={() => setShowOptions(!showOptions)}>

@@ -10,6 +10,7 @@
   padding: 1rem;
   margin-bottom: 1.25rem;
   border-left: solid 2px #ffd500;
+  border-bottom: solid 2px #ffd500;
   box-shadow: 0 2px 8px rgba(0,0,0,0.6);
   transition: transform 0.25s, box-shadow 0.25s;
   position: relative;
@@ -24,12 +25,34 @@
 
 /* header row */
 .task-header {
+  position: relative; /* Needed for pseudo-element positioning */
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   cursor: pointer;
+  padding-bottom: 0;   /* No bottom padding by default */
+  margin-bottom: 0; 
+}
+
+.task-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;               /* Adjust the thickness as desired */
+  background: #FFD500;       /* Primary Yellow */
+  border-radius: 9999px;      /* Fully rounded for a pill shape */
+  display: none;             /* Hidden by default */
+}
+
+.task-header.expanded {
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #222;
+  margin-bottom: 0.5rem;
+}
+
+.task-header.expanded::after {
+  display: block;
 }
 
 /* title text */

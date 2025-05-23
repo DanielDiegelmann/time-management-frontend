@@ -5,6 +5,7 @@
    .project-card {
     background: #111;
     border-left: solid 2px #ffd500;
+    border-bottom: 2px solid #ffd500;
     border-radius: 8px;
     padding: 0.8rem;
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
@@ -16,22 +17,46 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   }
   
-  .project-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    border-bottom: 2px solid #222;
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.5rem; 
-  }
-  
-  .project-header h4 {
-    margin: 0;
-    font-size: 1.1rem;
-    color: #fff;
-    flex: 1;
-  }
+  /* Project Header */
+.project-header {
+  position: relative; /* Needed for pseudo-element positioning */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding-bottom: 0;   /* No bottom padding by default */
+  margin-bottom: 0;    /* No bottom margin by default */
+}
+
+/* Pseudo-element for the pill-shaped stroke */
+.project-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;               /* Adjust the thickness as desired */
+  background: #FFD500;       /* Primary Yellow */
+  border-radius: 9999px;      /* Fully rounded for a pill shape */
+  display: none;             /* Hidden by default */
+}
+
+/* When expanded, display the stroke and add bottom margin and padding */
+.project-header.expanded {
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.project-header.expanded::after {
+  display: block;
+}
+
+.project-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #fff;
+  flex: 1;
+}
   
   .options-container {
     position: relative;
@@ -60,7 +85,7 @@
   
   .options-dropdown button {
     display: block;
-    color:#333;
+    color: #333;
     width: 100%;
     padding: 0.5rem 1rem;
     background: transparent;
