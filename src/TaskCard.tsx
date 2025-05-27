@@ -1,10 +1,11 @@
 // 2025-03-10 17:20:00 (updated 2025-03-11 16:00:00)
 // client/src/TaskCard.tsx
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, DragEvent } from 'react';
 import AssignTaskModal from './AssignTaskModal';
 import './TaskCard.css';
 import GoalHistoryModal from './GoalHistoryModal';
+import MediaGalleryModal from './MediaGalleryModal'; // New component for slideshow
 
 interface Note {
   text: string;
@@ -145,6 +146,11 @@ export default function TaskCard({
   const [showOptions, setShowOptions] = useState(false);
   const [showGoalHistory, setShowGoalHistory] = useState(false);
   
+  // New state for media files (array of image URLs)
+  const [mediaFiles, setMediaFiles] = useState<string[]>([]);
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  
   // Local state for rounds, goal, and goalType
   const [rounds, setRounds] = useState(task.rounds !== undefined ? task.rounds : 0);
   const [goal, setGoal] = useState(task.goal !== undefined ? task.goal : 0);
@@ -184,49 +190,50 @@ export default function TaskCard({
     };
   }, []);
   
-  const formatLocalTime = (seconds: number) => {
-    const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-    const s = String(seconds % 60).padStart(2, "0");
-    return `${m}:${s}`;
+  // New media handler: File selection from input or drop event.
+  const handleMediaUpload = (files: FileList) => {
+    const urls: string[] = [];
+    Array.from(files).forEach(file => {
+      // For a real app, you would perform an upload to server here.
+      // For demo, we generate a temporary URL.
+      urls.push(URL.createObjectURL(file));
+    });
+    setMediaFiles(prev => [...prev, ...urls]);
   };
-  
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      handleMediaUpload(e.target.files);
+    }
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files) {
+      handleMediaUpload(e.dataTransfer.files);
+    }
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
   const handleProgressChange = (newProgress: string) => {
-    console.log("handleProgressChange requested:", newProgress);
     setProgressStatus(newProgress);
     if (onUpdateProgress) {
-      onUpdateProgress(task._id, newProgress)
-        .then(updatedTask => {
-          if (updatedTask) {
-            console.log("handleProgressChange updated task progress:", updatedTask.progress);
-          } else {
-            console.warn("handleProgressChange: No updated task returned");
-          }
-        })
-        .catch(err => console.error("Error updating progress:", err));
+      onUpdateProgress(task._id, newProgress).catch(err => console.error("Error updating progress:", err));
     } else if (onEdit) {
-      onEdit(task._id, task.title, task.notes || "", newProgress)
-        .then(updatedTask => {
-          if (updatedTask) {
-            console.log("handleProgressChange updated task progress:", updatedTask.progress);
-          } else {
-            console.warn("handleProgressChange: No updated task returned");
-          }
-        })
-        .catch(err => console.error("Error updating progress:", err));
+      onEdit(task._id, task.title, task.notes || "", newProgress).catch(err => console.error("Error updating progress:", err));
     }
   };
   
   const handleWorkingChange = (working: boolean) => {
     if (working && !isWorking) {
-      if (onStartTimer) {
-        onStartTimer(task._id).catch(err => console.error(err));
-      }
+      onStartTimer && onStartTimer(task._id).catch(err => console.error(err));
       setIsWorking(true);
       intervalRef.current = setInterval(() => setLocalTime(prev => prev + 1), 1000);
     } else if (!working && isWorking) {
-      if (onStopTimer) {
-        onStopTimer(task._id).catch(err => console.error(err));
-      }
+      onStopTimer && onStopTimer(task._id).catch(err => console.error(err));
       setIsWorking(false);
       if (intervalRef.current) clearInterval(intervalRef.current);
       setLocalTime(0);
@@ -236,13 +243,8 @@ export default function TaskCard({
   const handleRoundsIncrement = () => {
     const newRounds = rounds + 1;
     setRounds(newRounds);
-    console.log(`Rounds incremented: ${newRounds}`);
     if (onUpdateRounds) {
-      onUpdateRounds(task._id, newRounds)
-        .then(updatedTask => {
-          console.log("Rounds updated on server:", updatedTask.rounds);
-        })
-        .catch(err => console.error("Error updating rounds:", err));
+      onUpdateRounds(task._id, newRounds).catch(err => console.error("Error updating rounds:", err));
     }
   };
 
@@ -250,13 +252,8 @@ export default function TaskCard({
     if (rounds > 0) {
       const newRounds = rounds - 1;
       setRounds(newRounds);
-      console.log(`Rounds decremented: ${newRounds}`);
       if (onUpdateRounds) {
-        onUpdateRounds(task._id, newRounds)
-          .then(updatedTask => {
-            console.log("Rounds updated on server:", updatedTask.rounds);
-          })
-          .catch(err => console.error("Error updating rounds:", err));
+        onUpdateRounds(task._id, newRounds).catch(err => console.error("Error updating rounds:", err));
       }
     }
   };
@@ -264,30 +261,17 @@ export default function TaskCard({
   const handleGoalUpdate = () => {
     setGoal(goalInput);
     setShowGoalInput(false);
-    console.log(`Updating goal: ${goalInput} with type: ${goalType}`);
     if (onUpdateGoal) {
-      onUpdateGoal(task._id, goalInput, goalType)
-        .then(updatedTask => {
-          if (updatedTask) {
-            console.log("Goal updated to:", updatedTask.goal, "Type:", goalType);
-          } else {
-            console.warn("handleGoalUpdate: No updated task returned");
-          }
-        })
-        .catch(err => console.error("Error updating goal:", err));
+      onUpdateGoal(task._id, goalInput, goalType).catch(err => console.error("Error updating goal:", err));
     }
   };
 
-// Update handleAssign to be async and await the assignment and refresh:
-const handleAssign = async (taskId: string, projectId: string) => {
+  const handleAssign = async (taskId: string, projectId: string) => {
     if (onAssign) {
-      await onAssign(taskId, projectId); // Wait for the server update to complete
-      if (refreshTasks) {
-        await refreshTasks(); // Then refresh the task list immediately
-      }
+      await onAssign(taskId, projectId);
+      if (refreshTasks) await refreshTasks();
     }
   };
-  
 
   return (
     <div className="task-card">
@@ -308,17 +292,16 @@ const handleAssign = async (taskId: string, projectId: string) => {
         <h3 onClick={() => setIsExpanded(!isExpanded)}>{task.title}</h3>
         {/* Status display */}
         <div className="status-display">
-        <span data-label="progress-status">Progress: {progressStatus}</span>
-        {isWorking && <span data-label="working-status"> Working</span>}
-        {(goal > 0 || rounds > 0) && (
+          <span data-label="progress-status">{progressStatus}</span>
+          {isWorking && <span data-label="working-status"> Working</span>}
+          {(goal > 0 || rounds > 0) && (
             <span data-label="rounds-goal-status">
-            {" "}
-            | Rounds: {rounds}
-            {goal > 0 && ` / ${goal} (${goalType})`}
+              {" "}
+              | Rounds: {rounds}
+              {goal > 0 && ` / ${goal} (${goalType})`}
             </span>
-        )}
+          )}
         </div>
-
         {/* Expand button */}
         <button className="expand-btn" onClick={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? '−' : '+'}
@@ -330,6 +313,45 @@ const handleAssign = async (taskId: string, projectId: string) => {
         <div className="task-body">
           <h4>Description</h4>
           {task.notes && <p className="task-description">{task.notes}</p>}
+          
+          {/* New Media Upload & Gallery Section */}
+          <div className="media-section">
+            <h4>Media</h4>
+            <div
+              className="media-upload-area"
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              style={{ border: '2px dashed #FFD500', padding: '1rem', borderRadius: '8px', textAlign: 'center', marginBottom: '1rem' }}
+            >
+              <p>Drag and drop media files here, or click to upload</p>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileInputChange}
+                style={{ display: 'none' }}
+                id={`media-upload-${task._id}`}
+              />
+              <label htmlFor={`media-upload-${task._id}`} style={{ cursor: 'pointer', color: '#FFD500', fontWeight: 'bold' }}>
+                Upload Media
+              </label>
+            </div>
+            {mediaFiles.length > 0 && (
+              <div className="media-gallery" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.5rem', marginBottom: '1rem' }}>
+                {mediaFiles.map((src, index) => (
+                  <img
+                    key={index}
+                    src={src}
+                    alt={`Uploaded media ${index + 1}`}
+                    style={{ width: '100%', height: 'auto', borderRadius: '4px', cursor: 'pointer' }}
+                    onClick={() => { setCurrentMediaIndex(index); setShowMediaModal(true); }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          {/* End of Media Section */}
+          
           {showEdit && onEdit && (
             <EditTaskForm task={task} onEdit={onEdit} onClose={() => setShowEdit(false)} />
           )}
@@ -502,7 +524,16 @@ const handleAssign = async (taskId: string, projectId: string) => {
               onAssign={handleAssign}
             />
           )}
+          {/* End of task-body */}
         </div>
+      )}
+      {/* Media Gallery Modal */}
+      {showMediaModal && (
+        <MediaGalleryModal
+          mediaFiles={mediaFiles}
+          initialIndex={currentMediaIndex}
+          onClose={() => setShowMediaModal(false)}
+        />
       )}
     </div>
   );

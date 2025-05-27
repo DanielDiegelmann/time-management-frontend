@@ -268,7 +268,6 @@ body {
 /* “Background pill” behind the active tab */
 .nav-link.active {
   color: #000;
-  font-weight: 600;
 }
 
 .nav-link.active::before {

@@ -96,7 +96,7 @@
   width: 1.25rem;
   height: 1.25rem;
   position: relative;
-  margin-left: 0.75rem;
+  margin-left: 0.75rem !important;
 }
 .drag-handle::before,
 .drag-handle::after {
@@ -112,6 +112,7 @@
 
 /* expand / collapse chevron */
 .expand-btn {
+  display: none;
   background: none;
   border: none;
   color: #888;
@@ -246,12 +247,26 @@
   font-weight: 700;
 }
 
+.goal-control button {
+  margin: 0 auto 1.5rem auto;
+  padding: 0.8rem 1.6rem;
+  background: #FF8800;
+  border: none;
+  border-radius: 16px;
+  color: #000000;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
 .rounds-control button {
+  padding: unset;
   width: 2.5rem;
   height: 2.5rem;
-  border: 2px solid #28a745;
+  border: 2px solid #FF8800;
   background: transparent;
-  color: #28a745;
+  color: #FF8800;
   border-radius: 50%;
   font-size: 1.25rem;
   line-height: 1;
@@ -262,7 +277,7 @@
     color 0.3s,
     transform 0.2s,
     box-shadow 0.3s;
-  box-shadow: 0 0 4px rgba(40,167,69,0.4);
+  box-shadow: 0 0 4px rgba(167, 120, 40, 0.4);
 }
 .rounds-control button:hover {
   background: #28a745;
@@ -330,4 +345,15 @@
   .actions { justify-content: center; }
   .task-card { padding: 0.75rem; }
   .task-header h3 { font-size: 0.95rem; }
+
+  .status-display span {
+  position: absolute;
+    top: -12px;
+    right: -16px;
+    border-radius: 0px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 0px;
+  }
+
 }
