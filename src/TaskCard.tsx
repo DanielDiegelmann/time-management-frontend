@@ -190,15 +190,38 @@ export default function TaskCard({
     };
   }, []);
   
-  // New media handler: File selection from input or drop event.
-  const handleMediaUpload = (files: FileList) => {
-    const urls: string[] = [];
-    Array.from(files).forEach(file => {
-      // For a real app, you would perform an upload to server here.
-      // For demo, we generate a temporary URL.
-      urls.push(URL.createObjectURL(file));
-    });
-    setMediaFiles(prev => [...prev, ...urls]);
+  const uploadMediaFile = async (taskId: string, file: File): Promise<string | undefined> => {
+    const formData = new FormData();
+    formData.append("media", file); // Field name "media"
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}/media`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error('Media upload failed');
+      }
+      // Expecting updated task document which includes the media array
+      const updatedTask = await response.json();
+      // Return the URL of the newly added media (assuming it is the last element)
+      return updatedTask.media[updatedTask.media.length - 1];
+    } catch (error) {
+      console.error("Error uploading media:", error);
+      return undefined;
+    }
+  };
+
+  const handleMediaUpload = async (files: FileList) => {
+    const uploadedMediaUrls: string[] = [];
+    for (const file of Array.from(files)) {
+      const url = await uploadMediaFile(task._id, file);
+      if (url) {
+        uploadedMediaUrls.push(url);
+      }
+    }
+    // Update your state (mediaFiles) with the new URLs from the backend
+    setMediaFiles((prev) => [...prev, ...uploadedMediaUrls]);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

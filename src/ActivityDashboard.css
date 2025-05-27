@@ -1,6 +1,6 @@
 /* Page Background and Container */
 .dashboard-container {
-  padding: 1.5rem;
+  padding: 12px;
   background: #000000; /* Page Background (Black) */
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
