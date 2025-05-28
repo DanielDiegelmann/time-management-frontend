@@ -366,6 +366,7 @@ export default function TaskCard({
                 Upload Media
               </label>
             </div>
+            {/* Media Gallery */}
             {mediaFiles.length > 0 && (
               <div
                 className="media-gallery"
@@ -377,15 +378,11 @@ export default function TaskCard({
                 }}
               >
                 {mediaFiles.map((src, index) => {
-                  // Normalize URL: if starts with '/', prepend the API base URL
-                  const imageUrl = src.startsWith('/')
-                    ? `${import.meta.env.VITE_API_BASE_URL}${src}`
-                    : src;
-                  console.log("Image URL:", imageUrl);
+                  console.log("Using image URL:", src);
                   return (
                     <img
                       key={index}
-                      src={imageUrl}
+                      src={src} // Using the complete URL provided by the back end
                       alt={`Uploaded media ${index + 1}`}
                       style={{
                         width: '100%',
