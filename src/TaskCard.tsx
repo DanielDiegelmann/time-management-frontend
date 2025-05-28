@@ -184,6 +184,13 @@ export default function TaskCard({
     setGoal(task.goal !== undefined ? task.goal : 0);
   }, [task.goal]);
 
+  // Sync initial media URLs (and any backend‐side changes) into local state
+  useEffect(() => {
+    if (Array.isArray(task.media)) {
+      setMediaFiles(task.media);
+    }
+  }, [task.media]);
+  
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
