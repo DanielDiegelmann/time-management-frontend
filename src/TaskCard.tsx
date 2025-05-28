@@ -367,16 +367,35 @@ export default function TaskCard({
               </label>
             </div>
             {mediaFiles.length > 0 && (
-              <div className="media-gallery" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.5rem', marginBottom: '1rem' }}>
-                {mediaFiles.map((src, index) => (
-                  <img
-                    key={index}
-                    src={src}
-                    alt={`Uploaded media ${index + 1}`}
-                    style={{ width: '100%', height: 'auto', borderRadius: '4px', cursor: 'pointer' }}
-                    onClick={() => { setCurrentMediaIndex(index); setShowMediaModal(true); }}
-                  />
-                ))}
+              <div
+                className="media-gallery"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+                  gap: '0.5rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                {mediaFiles.map((src, index) => {
+                  console.log("Image URL:", src);
+                  return (
+                    <img
+                      key={index}
+                      src={src}
+                      alt={`Uploaded media ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => {
+                        setCurrentMediaIndex(index);
+                        setShowMediaModal(true);
+                      }}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>
