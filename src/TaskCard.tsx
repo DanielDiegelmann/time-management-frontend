@@ -7,6 +7,8 @@ import './TaskCard.css';
 import GoalHistoryModal from './GoalHistoryModal';
 import MediaGalleryModal from './MediaGalleryModal'; // New component for slideshow
 
+const TASK_CARD_VERSION = "2025-03-11 16:00:00";
+
 interface Note {
   text: string;
   timestamp: string;
@@ -195,6 +197,11 @@ export default function TaskCard({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
+  }, []);
+  
+  // Log the version on mount
+  useEffect(() => {
+    console.log("TaskCard version:", TASK_CARD_VERSION);
   }, []);
   
   const uploadMediaFile = async (taskId: string, file: File): Promise<string | undefined> => {
