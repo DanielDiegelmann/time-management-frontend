@@ -313,28 +313,6 @@ export default function TaskCard({
     }
   };
 
-  const handleRemoveImage = async (imageUrl: string) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/tasks/${task._id}/media`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageUrl }),
-        }
-      );
-      if (response.ok) {
-        // Remove image from the local state to update the UI
-        setMediaFiles((prev) => prev.filter((url) => url !== imageUrl));
-        console.log("Image removed successfully");
-      } else {
-        console.error("Failed to remove image:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error removing image:", error);
-    }
-  };
-
   return (
     <div className="task-card">
       <div className={`task-header ${isExpanded ? "expanded" : ""}`}>
@@ -412,39 +390,21 @@ export default function TaskCard({
                 {mediaFiles.map((src, index) => {
                   console.log("Using image URL:", src);
                   return (
-                    <div key={index} style={{ position: 'relative' }}>
-                      <img
-                        src={src}
-                        alt={`Uploaded media ${index + 1}`}
-                        style={{
-                          width: '100%',
-                          height: 'auto',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                        }}
-                        onClick={() => {
-                          setCurrentMediaIndex(index);
-                          setShowMediaModal(true);
-                        }}
-                      />
-                      <button
-                        onClick={() => handleRemoveImage(src)}
-                        style={{
-                          position: 'absolute',
-                          top: '5px',
-                          right: '5px',
-                          background: 'red',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '50%',
-                          cursor: 'pointer',
-                          width: '24px',
-                          height: '24px',
-                        }}
-                      >
-                        &times;
-                      </button>
-                    </div>
+                    <img
+                      key={index}
+                      src={src} // Using the complete URL provided by the back end
+                      alt={`Uploaded media ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => {
+                        setCurrentMediaIndex(index);
+                        setShowMediaModal(true);
+                      }}
+                    />
                   );
                 })}
               </div>
