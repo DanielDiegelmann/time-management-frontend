@@ -1,13 +1,11 @@
-// 2025-03-10 17:20:00 (updated 2025-03-11 16:00:00)
-// client/src/TaskCard.tsx
-// TaskCard.tsx
+// 2025-03-11 16:01:00 (updated with image delete capability)
 // This file is part of the Task Management App
 
 import React, { useEffect, useState, useRef, DragEvent } from 'react';
 import AssignTaskModal from './AssignTaskModal';
 import './TaskCard.css';
 import GoalHistoryModal from './GoalHistoryModal';
-import MediaGalleryModal from './MediaGalleryModal'; // New component for slideshow
+import MediaGalleryModal from './MediaGalleryModal'; // Component for slideshow
 
 const TASK_CARD_VERSION = "2025-03-11 16:01:00";
 
@@ -32,15 +30,16 @@ interface Task {
   _id: string;
   title: string;
   notes?: string;
-  progress?: string; // Broad progress status
-  rounds?: number;  // NEW: Rounds completed
-  goal?: number;    // NEW: Target rounds (e.g. per day)
-  goalType?: string; // NEW: Frequency (Daily/Weekly/Monthly)
+  progress?: string;
+  rounds?: number;
+  goal?: number;
+  goalType?: string;
   detailedNotes?: Note[];
   timeEntries?: TimeEntry[];
   activityLogs?: ActivityLog[];
   status: string;
   projectId?: string;
+  media?: string[];
 }
 
 interface Project {
@@ -62,7 +61,7 @@ interface TaskCardProps {
   onAssign?: (taskId: string, projectId: string) => void;
   availableProjects?: Project[];
   dragHandleProps?: any;
-  refreshTasks?: () => void;  // New prop to allow immediate refresh after assignment
+  refreshTasks?: () => void;
 }
 
 function EditTaskForm({ task, onEdit, onClose }: { 
@@ -106,7 +105,6 @@ function EditTaskForm({ task, onEdit, onClose }: {
   );
 }
 
-
 function AddDetailedNoteForm({ taskId, onAdd }: { taskId: string; onAdd?: (id: string, noteText: string) => void; }) {
   const [noteText, setNoteText] = useState('');
   const handleSubmit = (e: React.FormEvent) => {
@@ -139,7 +137,7 @@ export default function TaskCard({
   onAssign,
   availableProjects = [],
   dragHandleProps,
-  refreshTasks,  // New prop
+  refreshTasks,
 }: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -151,7 +149,7 @@ export default function TaskCard({
   const [showOptions, setShowOptions] = useState(false);
   const [showGoalHistory, setShowGoalHistory] = useState(false);
   
-  // New state for media files (array of image URLs)
+  // State for media files (array of image URLs)
   const [mediaFiles, setMediaFiles] = useState<string[]>([]);
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -163,7 +161,6 @@ export default function TaskCard({
   const [showGoalInput, setShowGoalInput] = useState(false);
   const [goalInput, setGoalInput] = useState(goal);
 
-  // Sync goalType when task prop changes
   useEffect(() => {
     setGoalType(task.goalType !== undefined ? task.goalType : "Daily");
   }, [task.goalType]);
@@ -189,7 +186,6 @@ export default function TaskCard({
     setGoal(task.goal !== undefined ? task.goal : 0);
   }, [task.goal]);
 
-  // Sync initial media URLs (and any backend‐side changes) into local state
   useEffect(() => {
     if (Array.isArray(task.media)) {
       setMediaFiles(task.media);
@@ -202,14 +198,14 @@ export default function TaskCard({
     };
   }, []);
   
-  // Log the version on mount
   useEffect(() => {
     console.log("TaskCard version:", TASK_CARD_VERSION);
   }, []);
   
+  // Upload a media file and return the new image URL from the backend (which uses publicURL)
   const uploadMediaFile = async (taskId: string, file: File): Promise<string | undefined> => {
     const formData = new FormData();
-    formData.append("media", file); // Field name "media"
+    formData.append("media", file);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}/media`, {
@@ -219,9 +215,7 @@ export default function TaskCard({
       if (!response.ok) {
         throw new Error('Media upload failed');
       }
-      // Expecting updated task document which includes the media array
       const updatedTask = await response.json();
-      // Return the URL of the newly added media (assuming it is the last element)
       return updatedTask.media[updatedTask.media.length - 1];
     } catch (error) {
       console.error("Error uploading media:", error);
@@ -229,6 +223,7 @@ export default function TaskCard({
     }
   };
 
+  // Handle multiple file upload
   const handleMediaUpload = async (files: FileList) => {
     const uploadedMediaUrls: string[] = [];
     for (const file of Array.from(files)) {
@@ -237,7 +232,6 @@ export default function TaskCard({
         uploadedMediaUrls.push(url);
       }
     }
-    // Update your state (mediaFiles) with the new URLs from the backend
     setMediaFiles((prev) => [...prev, ...uploadedMediaUrls]);
   };
 
@@ -313,14 +307,33 @@ export default function TaskCard({
     }
   };
 
+  // New remove image function which calls the DELETE endpoint
+  const handleRemoveImage = async (imageUrl: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/tasks/${task._id}/media`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageUrl }),
+        }
+      );
+      if (response.ok) {
+        setMediaFiles((prev) => prev.filter((url) => url !== imageUrl));
+        console.log("Image removed successfully");
+      } else {
+        console.error("Failed to remove image:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error removing image:", error);
+    }
+  };
+
   return (
     <div className="task-card">
       <div className={`task-header ${isExpanded ? "expanded" : ""}`}>
-        {/* Options button on the far left */}
         <div className="options-container">
-          <button className="options-btn" onClick={() => setShowOptions(!showOptions)}>
-            ⋮
-          </button>
+          <button className="options-btn" onClick={() => setShowOptions(!showOptions)}>⋮</button>
           {showOptions && (
             <div className="options-dropdown">
               <button onClick={() => { setShowEdit(true); setShowOptions(false); }}>Edit</button>
@@ -328,25 +341,19 @@ export default function TaskCard({
             </div>
           )}
         </div>
-        {/* Title */}
         <h3 onClick={() => setIsExpanded(!isExpanded)}>{task.title}</h3>
-        {/* Status display */}
         <div className="status-display">
           <span data-label="progress-status">{progressStatus}</span>
           {isWorking && <span data-label="working-status"> Working</span>}
           {(goal > 0 || rounds > 0) && (
             <span data-label="rounds-goal-status">
-              {" "}
-              | Rounds: {rounds}
-              {goal > 0 && ` / ${goal} (${goalType})`}
+              {" "} | Rounds: {rounds}{goal > 0 && ` / ${goal} (${goalType})`}
             </span>
           )}
         </div>
-        {/* Expand button */}
         <button className="expand-btn" onClick={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? '−' : '+'}
         </button>
-        {/* Drag handle at far right */}
         <span className="drag-handle" {...(dragHandleProps || {})}></span>
       </div>
       {isExpanded && (
@@ -354,7 +361,7 @@ export default function TaskCard({
           <h4>Description</h4>
           {task.notes && <p className="task-description">{task.notes}</p>}
           
-          {/* New Media Upload & Gallery Section */}
+          {/* Media Upload & Gallery Section */}
           <div className="media-section">
             <h4>Media</h4>
             <div
@@ -376,7 +383,6 @@ export default function TaskCard({
                 Upload Media
               </label>
             </div>
-            {/* Media Gallery */}
             {mediaFiles.length > 0 && (
               <div
                 className="media-gallery"
@@ -390,28 +396,44 @@ export default function TaskCard({
                 {mediaFiles.map((src, index) => {
                   console.log("Using image URL:", src);
                   return (
-                    <img
-                      key={index}
-                      src={src} // Using the complete URL provided by the back end
-                      alt={`Uploaded media ${index + 1}`}
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                      }}
-                      onClick={() => {
-                        setCurrentMediaIndex(index);
-                        setShowMediaModal(true);
-                      }}
-                    />
+                    <div key={index} style={{ position: 'relative' }}>
+                      <img
+                        src={src}
+                        alt={`Uploaded media ${index + 1}`}
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => {
+                          setCurrentMediaIndex(index);
+                          setShowMediaModal(true);
+                        }}
+                      />
+                      <button
+                        onClick={() => handleRemoveImage(src)}
+                        style={{
+                          position: 'absolute',
+                          top: '5px',
+                          right: '5px',
+                          background: 'red',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          cursor: 'pointer',
+                          width: '24px',
+                          height: '24px',
+                        }}
+                      >
+                        &times;
+                      </button>
+                    </div>
                   );
                 })}
               </div>
             )}
           </div>
-          {/* End of Media Section */}
-          
           {showEdit && onEdit && (
             <EditTaskForm task={task} onEdit={onEdit} onClose={() => setShowEdit(false)} />
           )}
@@ -487,7 +509,6 @@ export default function TaskCard({
               Not working
             </label>
           </div>
-          {/* Rounds and Goal section */}
           <div className="rounds-goal" data-label="rounds-goal">
             <div className="rounds-control">
               <span data-label="rounds-display">
@@ -546,9 +567,7 @@ export default function TaskCard({
             <h4>Time Tracking (Backend)</h4>
             <div className="timer-actions">
               <button onClick={() => onStartTimer && onStartTimer(task._id)}>Start Timer</button>
-              <button onClick={() => onStopTimer && onStopTimer(task._id)} className="secondary">
-                Stop Timer
-              </button>
+              <button onClick={() => onStopTimer && onStopTimer(task._id)} className="secondary">Stop Timer</button>
             </div>
             <ul className="timer-list">
               {task.timeEntries &&
@@ -587,7 +606,6 @@ export default function TaskCard({
           {/* End of task-body */}
         </div>
       )}
-      {/* Media Gallery Modal */}
       {showMediaModal && (
         <MediaGalleryModal
           mediaFiles={mediaFiles}
