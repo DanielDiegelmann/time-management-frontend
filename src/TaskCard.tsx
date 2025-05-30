@@ -1,5 +1,7 @@
 // 2025-03-10 17:20:00 (updated 2025-03-11 16:00:00)
 // client/src/TaskCard.tsx
+// TaskCard.tsx
+// This file is part of the Task Management App
 
 import React, { useEffect, useState, useRef, DragEvent } from 'react';
 import AssignTaskModal from './AssignTaskModal';
@@ -7,7 +9,7 @@ import './TaskCard.css';
 import GoalHistoryModal from './GoalHistoryModal';
 import MediaGalleryModal from './MediaGalleryModal'; // New component for slideshow
 
-const TASK_CARD_VERSION = "2025-03-11 16:00:00";
+const TASK_CARD_VERSION = "2025-03-11 16:01:00";
 
 interface Note {
   text: string;
@@ -103,6 +105,7 @@ function EditTaskForm({ task, onEdit, onClose }: {
     </div>
   );
 }
+
 
 function AddDetailedNoteForm({ taskId, onAdd }: { taskId: string; onAdd?: (id: string, noteText: string) => void; }) {
   const [noteText, setNoteText] = useState('');
