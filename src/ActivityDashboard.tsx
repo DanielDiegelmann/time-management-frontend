@@ -8,7 +8,7 @@ import './ActivityDashboard.css';
 
 export default function ActivityDashboard() {
   // Activities are used to render the activity cards.
-  const [activities, setActivities] = useState([]);
+  const [activities, setActivities] = useState<any[]>([]);
   // All tasks are fetched separately to drive the contextual alerts.
   const [allTasks, setAllTasks] = useState([]);
   const [allProjects, setAllProjects] = useState([]);
@@ -60,8 +60,16 @@ export default function ActivityDashboard() {
     }
   };
 
-  // Stub for handleAddActivity (since onSubmit uses it)
+  // Optimistic update: add a temporary placeholder right away and then replace it when the real activity is returned
   const handleAddActivity = async (activityData: any) => {
+    // Create a temporary activity placeholder with a temporary id and a loading flag
+    const tempActivity = {
+      _id: `temp-${Date.now()}`,
+      title: activityData.title,
+      description: activityData.description,
+      isLoading: true,
+    };
+    setActivities(prev => [tempActivity, ...prev]);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`, {
         method: 'POST',
@@ -69,10 +77,15 @@ export default function ActivityDashboard() {
         body: JSON.stringify(activityData)
       });
       const newActivity = await res.json();
-      setActivities(prev => [...prev, newActivity]);
+      // Replace the temporary activity with the real one
+      setActivities(prev =>
+        prev.map(act => (act._id === tempActivity._id ? newActivity : act))
+      );
       return newActivity;
     } catch (err) {
       console.error('Error adding activity:', err);
+      // Remove the temporary activity if there was an error
+      setActivities(prev => prev.filter(act => act._id !== tempActivity._id));
     }
   };
 
@@ -84,16 +97,14 @@ export default function ActivityDashboard() {
     fetchPomodoroSessions();
   }, []);
 
-  // Polling effect for real-time updates of all data points every 10 seconds
+  // Polling effect for real-time updates of all data points every 5 seconds
   useEffect(() => {
     const intervalId = setInterval(() => {
-      // Update all data points concurrently
       fetchActivities();
       fetchTasks();
       fetchProjects();
       fetchPomodoroSessions();
-    }, 5000); // 10 seconds polling interval
-
+    }, 5000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -359,6 +370,11 @@ export default function ActivityDashboard() {
         <AddActivityModal
           onClose={() => setShowAddActivityModal(false)}
           onSubmit={handleAddActivity}
+          onActivityAdded={(newActivity: any) => {
+            // In case the modal calls this callback, update state accordingly.
+            newActivity.isLoading = false;
+            setActivities(prev => [newActivity, ...prev]);
+          }}
         />
       )}
       <DragDropContext onDragEnd={handleDragEnd}>

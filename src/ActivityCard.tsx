@@ -39,6 +39,7 @@ interface ActivityCardProps {
   onUpdateGoal?: (id: string, newGoal: number, goalType: string) => Promise<any>;
   // NEW: Callback for updating rounds in tasks
   onUpdateRounds?: (id: string, newRounds: number) => Promise<any>;
+  setActivities: React.Dispatch<React.SetStateAction<any[]>>; // NEW: Added setActivities prop
 }
 
 export default function ActivityCard({
@@ -59,6 +60,7 @@ export default function ActivityCard({
   onUpdateProgress,
   onUpdateGoal,
   onUpdateRounds,
+  setActivities, // NEW: Destructure setActivities prop
 }: ActivityCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
@@ -66,6 +68,7 @@ export default function ActivityCard({
   const [showEditActivityModal, setShowEditActivityModal] = useState(false);
   // NEW: Local state for options dropdown
   const [showOptions, setShowOptions] = useState(false);
+  const [error, setError] = useState(''); // NEW: Local state for error handling
 
   const fetchProjects = async () => {
     try {
@@ -104,7 +107,22 @@ export default function ActivityCard({
 
   const handleActivityDelete = async (activityId: string) => {
     if (window.confirm("Are you sure you want to delete this activity?")) {
-      await onDeleteActivity(activityId);
+      setError(''); // Reset error state before deletion
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${activityId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (response.ok) {
+          setActivities(prev => prev.filter(act => act._id !== activityId));
+        } else {
+          const errText = await response.text();
+          throw new Error(errText);
+        }
+      } catch (err: any) {
+        console.error("Error deleting activity:", err);
+        setError(err.message || "Error deleting activity");
+      }
     }
   };
 
@@ -195,6 +213,8 @@ export default function ActivityCard({
           </DragDropContext>
         </div>
       )}
+      {/* Error message display */}
+      {error && <p className="error">{error}</p>}
     </div>
   );
 }

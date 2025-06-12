@@ -3,7 +3,7 @@ import './AddActivityModal.css';
 
 interface AddActivityModalProps {
   onClose: () => void;
-  onActivityAdded?: (activity: any) => void;
+  onActivityAdded: (activity: any) => void;
 }
 
 export default function AddActivityModal({ onClose, onActivityAdded }: AddActivityModalProps) {
@@ -32,10 +32,7 @@ export default function AddActivityModal({ onClose, onActivityAdded }: AddActivi
       }
       
       const newActivity = await response.json();
-      // Call the callback only if it's defined as a function.
-      if (typeof onActivityAdded === 'function') {
-        onActivityAdded(newActivity);
-      }
+      onActivityAdded(newActivity);
       onClose();
     } catch (err: any) {
       console.error("Error adding activity:", err);
