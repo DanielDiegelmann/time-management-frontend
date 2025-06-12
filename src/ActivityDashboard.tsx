@@ -22,12 +22,14 @@ export default function ActivityDashboard() {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`);
       const data = await res.json();
+      console.log("Raw activities from backend:", data);
       if (data && Array.isArray(data)) {
         data.sort((a, b) => {
           const aOrder = a.order !== undefined ? a.order : Infinity;
           const bOrder = b.order !== undefined ? b.order : Infinity;
           return aOrder - bOrder;
         });
+        console.log("Activities sorted by order:", data);
       }
       setActivities(data);
     } catch (err) {
@@ -79,6 +81,7 @@ export default function ActivityDashboard() {
       ? Math.min(...activities.map(a => a.order !== undefined ? a.order : Infinity))
       : 0;
     const newOrder = currentMinOrder - 1;  // New activity goes to the top
+    console.log("Computed new order for added activity:", newOrder);
 
     // Temporary placeholder activity with computed order.
     const tempActivity = {
@@ -88,18 +91,20 @@ export default function ActivityDashboard() {
       order: newOrder,
       isLoading: true,
     };
+    console.log("Adding temporary activity:", tempActivity);
     setActivities(prev => [tempActivity, ...prev]);
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Do not send order from the modal; the backend will ignore it.
+        // Do not send order from the modal; backend will ignore it.
         body: JSON.stringify(activityData)
       });
       const newActivity = await res.json();
       // Overwrite temporary order with our computed order.
       newActivity.order = newOrder;
+      console.log("Received new activity from backend:", newActivity);
       // Replace the temporary activity with the real one.
       setActivities(prev =>
         prev.map(act => act._id === tempActivity._id ? newActivity : act)
@@ -134,27 +139,34 @@ export default function ActivityDashboard() {
   // 3. When the user manually drags activities to reorder them,
   // update the local state and persist the new order to the backend.
   const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
+    if (!result.destination) {
+      console.log("No destination in drag result:", result);
+      return;
+    }
     const reordered = Array.from(activities);
     const [removed] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, removed);
+    console.log("Activities reordered locally:", reordered);
     setActivities(reordered);
     // Persist new order to backend:
     updateActivityOrder(reordered);
   };
 
-  // 4. Persist manual ordering by updating each activity's "order" field based on its position.
+  // 4. Persist manual ordering by updating each activity's "order" field.
   const updateActivityOrder = async (orderedActivities: any[]) => {
+    console.log("Persisting new order for activities:", orderedActivities);
     try {
       for (let index = 0; index < orderedActivities.length; index++) {
         const activity = orderedActivities[index];
-        // Update activity order with the new index.
+        console.log(`Updating activity ${activity._id} to order: ${index}`);
         await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${activity._id}`, {
            method: 'PUT',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({ order: index }),
          });
       }
+      // Refetch to ensure local state matches persisted order.
+      fetchActivities();
     } catch (error) {
       console.error("Error updating activity order:", error);
     }
