@@ -20,14 +20,12 @@ export default function ActivityDashboard() {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`);
       const data = await res.json();
-      // Sort by the "order" property if available:
+      // Always sort using the manual "order" field (missing values go to the bottom)
       if (data && Array.isArray(data)) {
         data.sort((a, b) => {
-          if (a.order !== undefined && b.order !== undefined) {
-            return a.order - b.order; // ascending order
-          }
-          // Fallback: sort descending by createdAt
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          const aOrder = a.order !== undefined ? a.order : Infinity;
+          const bOrder = b.order !== undefined ? b.order : Infinity;
+          return aOrder - bOrder;
         });
       }
       setActivities(data);
