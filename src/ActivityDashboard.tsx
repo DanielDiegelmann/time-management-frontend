@@ -20,9 +20,15 @@ export default function ActivityDashboard() {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`);
       const data = await res.json();
-      // Sort descending by creation date if available
+      // Sort by the "order" property if available:
       if (data && Array.isArray(data)) {
-        data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        data.sort((a, b) => {
+          if (a.order !== undefined && b.order !== undefined) {
+            return a.order - b.order; // ascending order
+          }
+          // Fallback: sort descending by createdAt
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
       }
       setActivities(data);
     } catch (err) {
@@ -119,6 +125,24 @@ export default function ActivityDashboard() {
     const [removed] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, removed);
     setActivities(reordered);
+    // Persist the new order to the backend
+    updateActivityOrder(reordered);
+  };
+
+  // New function to persist activity order to the backend
+  const updateActivityOrder = async (orderedActivities: any[]) => {
+    try {
+      for (let index = 0; index < orderedActivities.length; index++) {
+        const activity = orderedActivities[index];
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${activity._id}`, {
+           method: 'PUT',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ order: index }),
+         });
+      }
+    } catch (error) {
+      console.error("Error updating activity order:", error);
+    }
   };
 
   // --- Project Editing Callbacks ---

@@ -20,9 +20,11 @@ export default function AddActivityModal({ onClose, onActivityAdded }: AddActivi
         headers: {
           "Content-Type": "application/json"
         },
+        // Optional: include a default order value if needed.
         body: JSON.stringify({
           title: activityTitle,
-          description: activityDescription
+          description: activityDescription,
+          order: 0
         })
       });
       
