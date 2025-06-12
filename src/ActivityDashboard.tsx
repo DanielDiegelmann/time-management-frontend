@@ -356,6 +356,21 @@ export default function ActivityDashboard() {
     }
   };
 
+  // New function to handle activity deletion
+  const handleDeleteActivity = async (id: string) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setActivities(prev => prev.filter(act => act._id !== id));
+      } else {
+        const errText = await res.text();
+        throw new Error(errText);
+      }
+    } catch (err: any) {
+      console.error('Error deleting activity:', err);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <h1>Activity Dashboard</h1>
@@ -406,6 +421,7 @@ export default function ActivityDashboard() {
                           onStopTimer={handleStopTimer}
                           onAssign={handleAssignTask}
                           availableProjects={allProjects}
+                          onDeleteActivity={handleDeleteActivity} // Pass the new handler to ActivityCard
                         />
                       </div>
                     )}
