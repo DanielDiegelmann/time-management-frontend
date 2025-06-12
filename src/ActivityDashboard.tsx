@@ -72,29 +72,39 @@ export default function ActivityDashboard() {
 
   // Optimistic update: add a temporary placeholder right away and then replace it when the real activity is returned
   const handleAddActivity = async (activityData: any) => {
-    // Create a temporary activity placeholder with a temporary id and a loading flag
+    // Compute new order: if there are existing activities, use a value lower than the smallest order.
+    const currentMinOrder = activities.length > 0 
+      ? Math.min(...activities.map(a => a.order !== undefined ? a.order : Infinity))
+      : 0;
+    const newOrder = currentMinOrder - 1;  // New activity goes to the top
+    
+    // Create a temporary placeholder activity:
     const tempActivity = {
       _id: `temp-${Date.now()}`,
       title: activityData.title,
       description: activityData.description,
+      order: newOrder,
       isLoading: true,
     };
     setActivities(prev => [tempActivity, ...prev]);
+    
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Do not send order from the modal; the backend may create the record without an order.
         body: JSON.stringify(activityData)
       });
       const newActivity = await res.json();
-      // Replace the temporary activity with the real one
+      // Overwrite temporary order with our computed order
+      newActivity.order = newOrder;
+      // Replace the temporary activity with the real one:
       setActivities(prev =>
-        prev.map(act => (act._id === tempActivity._id ? newActivity : act))
+        prev.map(act => act._id === tempActivity._id ? newActivity : act)
       );
       return newActivity;
     } catch (err) {
       console.error('Error adding activity:', err);
-      // Remove the temporary activity if there was an error
       setActivities(prev => prev.filter(act => act._id !== tempActivity._id));
     }
   };

@@ -20,11 +20,10 @@ export default function AddActivityModal({ onClose, onActivityAdded }: AddActivi
         headers: {
           "Content-Type": "application/json"
         },
-        // Optional: include a default order value if needed.
+        // Remove the default order: the activity order will be determined in the dashboard
         body: JSON.stringify({
           title: activityTitle,
-          description: activityDescription,
-          order: 0
+          description: activityDescription
         })
       });
       
