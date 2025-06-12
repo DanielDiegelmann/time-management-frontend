@@ -20,6 +20,10 @@ export default function ActivityDashboard() {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`);
       const data = await res.json();
+      // Sort descending by creation date if available
+      if (data && Array.isArray(data)) {
+        data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      }
       setActivities(data);
     } catch (err) {
       console.error('Error fetching activities:', err);
@@ -408,7 +412,7 @@ export default function ActivityDashboard() {
                           key={activity._id}
                           activity={activity}
                           onToggleStatus={handleToggleStatus}
-                          onDelete={handleDeleteTask}
+                          onDelete={handleDeleteActivity}  // Use handleDeleteActivity here instead of handleDeleteTask
                           onEdit={handleEditTask}
                           onEditActivity={handleEditActivity}
                           onEditProject={handleEditProject}
@@ -421,7 +425,6 @@ export default function ActivityDashboard() {
                           onStopTimer={handleStopTimer}
                           onAssign={handleAssignTask}
                           availableProjects={allProjects}
-                          onDeleteActivity={handleDeleteActivity} // Pass the new handler to ActivityCard
                         />
                       </div>
                     )}
