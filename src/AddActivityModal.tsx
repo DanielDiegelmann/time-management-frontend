@@ -3,7 +3,7 @@ import './AddActivityModal.css';
 
 interface AddActivityModalProps {
   onClose: () => void;
-  onActivityAdded: (activity: any) => void;
+  onActivityAdded?: (activity: any) => void;
 }
 
 export default function AddActivityModal({ onClose, onActivityAdded }: AddActivityModalProps) {
@@ -21,9 +21,8 @@ export default function AddActivityModal({ onClose, onActivityAdded }: AddActivi
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          title: activityTitle,  // Changed field name to title
+          title: activityTitle,
           description: activityDescription
-          // add any other required fields
         })
       });
       
@@ -33,7 +32,10 @@ export default function AddActivityModal({ onClose, onActivityAdded }: AddActivi
       }
       
       const newActivity = await response.json();
-      onActivityAdded(newActivity);
+      // Call the callback only if it's defined as a function.
+      if (typeof onActivityAdded === 'function') {
+        onActivityAdded(newActivity);
+      }
       onClose();
     } catch (err: any) {
       console.error("Error adding activity:", err);
