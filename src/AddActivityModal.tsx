@@ -7,7 +7,7 @@ interface AddActivityModalProps {
 }
 
 export default function AddActivityModal({ onClose, onActivityAdded }: AddActivityModalProps) {
-  const [activityName, setActivityName] = useState('');
+  const [activityTitle, setActivityTitle] = useState('');
   const [activityDescription, setActivityDescription] = useState('');
   const [error, setError] = useState('');
 
@@ -21,13 +21,12 @@ export default function AddActivityModal({ onClose, onActivityAdded }: AddActivi
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          name: activityName,
+          title: activityTitle,  // Changed field name to title
           description: activityDescription
-          // include any required fields that your back end expects
+          // add any other required fields
         })
       });
       
-      // If the response is not OK, read text (might be HTML) for debugging
       if (!response.ok) {
         const errText = await response.text();
         throw new Error(errText);
@@ -50,9 +49,9 @@ export default function AddActivityModal({ onClose, onActivityAdded }: AddActivi
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            value={activityName}
-            onChange={(e) => setActivityName(e.target.value)}
-            placeholder="Activity Name"
+            value={activityTitle}
+            onChange={(e) => setActivityTitle(e.target.value)}
+            placeholder="Activity Title"
             required
           />
           <textarea
