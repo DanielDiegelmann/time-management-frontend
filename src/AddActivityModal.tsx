@@ -3,44 +3,66 @@ import './AddActivityModal.css';
 
 interface AddActivityModalProps {
   onClose: () => void;
-  onSubmit: (title: string, description: string) => void;
+  onActivityAdded: (activity: any) => void;
 }
 
-export default function AddActivityModal({ onClose, onSubmit }: AddActivityModalProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+export default function AddActivityModal({ onClose, onActivityAdded }: AddActivityModalProps) {
+  const [activityName, setActivityName] = useState('');
+  const [activityDescription, setActivityDescription] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim()) {
-      onSubmit(title, description);
+    setError('');
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: activityName,
+          description: activityDescription
+          // include any required fields that your back end expects
+        })
+      });
+      
+      // If the response is not OK, read text (might be HTML) for debugging
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText);
+      }
+      
+      const newActivity = await response.json();
+      onActivityAdded(newActivity);
       onClose();
+    } catch (err: any) {
+      console.error("Error adding activity:", err);
+      setError(err.message || "Error adding activity");
     }
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>Add New Activity</h3>
-        <form className="form-edit" onSubmit={handleSubmit}>
+        <h3>Add Activity</h3>
+        {error && <div className="error">{error}</div>}
+        <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Activity Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={activityName}
+            onChange={(e) => setActivityName(e.target.value)}
+            placeholder="Activity Name"
             required
           />
-          <input
-            type="text"
+          <textarea
+            value={activityDescription}
+            onChange={(e) => setActivityDescription(e.target.value)}
             placeholder="Activity Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
           />
           <div className="modal-actions">
-            <button type="submit">Add Activity</button>
-            <button type="button" onClick={onClose} className="secondary">
-              Cancel
-            </button>
+            <button type="submit">Create Activity</button>
+            <button type="button" onClick={onClose} className="secondary">Cancel</button>
           </div>
         </form>
       </div>
