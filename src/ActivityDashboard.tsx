@@ -15,21 +15,17 @@ export default function ActivityDashboard() {
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
   const [pomodoroSessions, setPomodoroSessions] = useState(0);
 
-  // Fetch activities (for the Activity cards)
-  // 1. Fetch activities sorted solely by the "order" field.
-  // Missing order values default to Infinity, ensuring they are placed at the bottom.
+  // Fetch activities (for the Activity cards) — sorted **only** by the `order` field.
   const fetchActivities = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`);
       const data = await res.json();
-      console.log("Raw activities from backend:", data);
-      if (data && Array.isArray(data)) {
+      if (Array.isArray(data)) {
         data.sort((a, b) => {
           const aOrder = a.order !== undefined ? a.order : Infinity;
           const bOrder = b.order !== undefined ? b.order : Infinity;
           return aOrder - bOrder;
         });
-        console.log("Activities sorted by order:", data);
       }
       setActivities(data);
     } catch (err) {
@@ -63,27 +59,31 @@ export default function ActivityDashboard() {
   const fetchPomodoroSessions = async () => {
     try {
       const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/pomodoro-sessions?date=${today}`);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/pomodoro-sessions?date=${today}`,
+      );
       const data = await res.json();
       setPomodoroSessions(data.sessionsCount);
     } catch (err) {
-      console.error("Error fetching pomodoro sessions:", err);
+      console.error('Error fetching pomodoro sessions:', err);
     }
   };
 
-  // Optimistic update: add a temporary placeholder right away and then replace it when the real activity is returned
-  // 2. Optimistic update when adding a new activity.
-  // Compute a new order value lower than the current minimum.
-  // This ensures the new activity appears at the top.
+  /*
+   *  Optimistic add:
+   *  1  Compute an order lower than the current minimum so the new activity appears on top.
+   *  2  Create the activity, then immediately persist that order so it survives reloads.
+   *  3  Replace the temporary placeholder with the definitive activity.
+   */
   const handleAddActivity = async (activityData: any) => {
-    // Compute new order: if there are existing activities, take one less than the minimum.
-    const currentMinOrder = activities.length > 0 
-      ? Math.min(...activities.map(a => a.order !== undefined ? a.order : Infinity))
-      : 0;
-    const newOrder = currentMinOrder - 1;  // New activity goes to the top
-    console.log("Computed new order for added activity:", newOrder);
+    // 1  Order lower than the current minimum
+    const currentMinOrder =
+      activities.length > 0
+        ? Math.min(...activities.map(a => (a.order !== undefined ? a.order : Infinity)))
+        : 0;
+    const newOrder = currentMinOrder - 1;
 
-    // Temporary placeholder activity with computed order.
+    // Temporary placeholder while the request is in flight
     const tempActivity = {
       _id: `temp-${Date.now()}`,
       title: activityData.title,
@@ -91,24 +91,30 @@ export default function ActivityDashboard() {
       order: newOrder,
       isLoading: true,
     };
-    console.log("Adding temporary activity:", tempActivity);
     setActivities(prev => [tempActivity, ...prev]);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`, {
+      // 2a  Create the activity
+      const createRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Do not send order from the modal; backend will ignore it.
-        body: JSON.stringify(activityData)
+        body: JSON.stringify(activityData),
       });
-      const newActivity = await res.json();
-      // Overwrite temporary order with our computed order.
+      const newActivity = await createRes.json();
+
+      // 2b  Persist the computed order so it survives refreshes
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${newActivity._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: newOrder }),
+      });
+
+      // 3  Replace placeholder with the real item
       newActivity.order = newOrder;
-      console.log("Received new activity from backend:", newActivity);
-      // Replace the temporary activity with the real one.
       setActivities(prev =>
-        prev.map(act => act._id === tempActivity._id ? newActivity : act)
+        prev.map(act => (act._id === tempActivity._id ? newActivity : act)),
       );
+
       return newActivity;
     } catch (err) {
       console.error('Error adding activity:', err);
@@ -135,61 +141,53 @@ export default function ActivityDashboard() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Drag and drop for activities (if needed)
-  // 3. When the user manually drags activities to reorder them,
-  // update the local state and persist the new order to the backend.
+  /* ---------- Drag-and-drop ordering ---------- */
   const handleDragEnd = (result: any) => {
-    if (!result.destination) {
-      console.log("No destination in drag result:", result);
-      return;
-    }
+    if (!result.destination) return;
     const reordered = Array.from(activities);
     const [removed] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, removed);
-    console.log("Activities reordered locally:", reordered);
     setActivities(reordered);
-    // Persist new order to backend:
     updateActivityOrder(reordered);
   };
 
-  // 4. Persist manual ordering by updating each activity's "order" field.
+  // Persist manual ordering by updating each activity's `order` field
   const updateActivityOrder = async (orderedActivities: any[]) => {
-    console.log("Persisting new order for activities:", orderedActivities);
     try {
       for (let index = 0; index < orderedActivities.length; index++) {
         const activity = orderedActivities[index];
-        console.log(`Updating activity ${activity._id} to order: ${index}`);
-        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${activity._id}`, {
-           method: 'PUT',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ order: index }),
-         });
+        await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/activities/${activity._id}`,
+          {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order: index }),
+          },
+        );
       }
-      // Refetch to ensure local state matches persisted order.
-      fetchActivities();
+      fetchActivities(); // keep local state in sync
     } catch (error) {
-      console.error("Error updating activity order:", error);
+      console.error('Error updating activity order:', error);
     }
   };
 
-  // --- Project Editing Callbacks ---
+  /* ---------- Project Editing Callbacks ---------- */
   const handleEditProject = async (
     projectId: string,
     newTitle: string,
-    newDescription: string
+    newDescription: string,
   ) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/${projectId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle, description: newDescription }),
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error);
-      }
-      const updatedProject = await res.json();
-      return updatedProject;
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/projects/${projectId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: newTitle, description: newDescription }),
+        },
+      );
+      if (!res.ok) throw new Error((await res.json()).error);
+      return await res.json();
     } catch (err) {
       console.error('Error editing project:', err);
     }
@@ -197,13 +195,15 @@ export default function ActivityDashboard() {
 
   const handleDeleteProject = async (projectId: string) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/${projectId}`, { method: 'DELETE' });
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
     } catch (err) {
       console.error('Error deleting project:', err);
     }
   };
 
-  // --- Task Callback Functions ---
+  /* ---------- Task Callbacks (unchanged) ---------- */
   const handleToggleStatus = async (task: any) => {
     const updatedStatus = task.status === 'completed' ? 'pending' : 'completed';
     try {
@@ -213,9 +213,7 @@ export default function ActivityDashboard() {
         body: JSON.stringify({ status: updatedStatus }),
       });
       const updatedTask = await res.json();
-      setAllTasks(prevTasks =>
-        prevTasks.map(t => (t._id === updatedTask._id ? updatedTask : t))
-      );
+      setAllTasks(prev => prev.map(t => (t._id === updatedTask._id ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error updating task status:', err);
@@ -224,7 +222,9 @@ export default function ActivityDashboard() {
 
   const handleDeleteTask = async (id: string) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${id}`, { method: 'DELETE' });
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${id}`, {
+        method: 'DELETE',
+      });
     } catch (err) {
       console.error('Error deleting task:', err);
     }
@@ -234,13 +234,10 @@ export default function ActivityDashboard() {
     taskId: string,
     newTitle: string,
     newNotes: string,
-    newProgress?: string
+    newProgress?: string,
   ) => {
     const payload: any = { title: newTitle, notes: newNotes };
-    if (newProgress !== undefined) {
-      payload.progress = newProgress;
-    }
-    console.log("handleEditTask payload:", payload);
+    if (newProgress !== undefined) payload.progress = newProgress;
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}`, {
         method: 'PUT',
@@ -248,10 +245,7 @@ export default function ActivityDashboard() {
         body: JSON.stringify(payload),
       });
       const updatedTask = await res.json();
-      console.log("handleEditTask updatedTask:", updatedTask);
-      setAllTasks(prevTasks =>
-        prevTasks.map(task => (task._id === updatedTask._id ? updatedTask : task))
-      );
+      setAllTasks(prev => prev.map(t => (t._id === updatedTask._id ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error editing task:', err);
@@ -259,19 +253,14 @@ export default function ActivityDashboard() {
   };
 
   const handleUpdateTaskProgress = async (taskId: string, newProgress: string) => {
-    const payload = { progress: newProgress };
-    console.log("handleUpdateTaskProgress payload:", payload);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ progress: newProgress }),
       });
       const updatedTask = await res.json();
-      console.log("handleUpdateTaskProgress updatedTask:", updatedTask);
-      setAllTasks(prevTasks =>
-        prevTasks.map(task => (task._id === updatedTask._id ? updatedTask : task))
-      );
+      setAllTasks(prev => prev.map(t => (t._id === updatedTask._id ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error updating task progress:', err);
@@ -281,23 +270,21 @@ export default function ActivityDashboard() {
   const handleEditActivity = async (
     activityId: string,
     newTitle: string,
-    newDescription: string
+    newDescription: string,
   ) => {
     try {
-      console.log("handleEditActivity", activityId, newTitle, newDescription);
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${activityId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle, description: newDescription }),
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("Error updating activity:", errorData.error);
-        throw new Error(errorData.error);
-      }
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/activities/${activityId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: newTitle, description: newDescription }),
+        },
+      );
+      if (!res.ok) throw new Error((await res.json()).error);
       const updatedActivity = await res.json();
       setActivities(prev =>
-        prev.map(act => (act._id === updatedActivity._id ? updatedActivity : act))
+        prev.map(act => (act._id === updatedActivity._id ? updatedActivity : act)),
       );
       return updatedActivity;
     } catch (err) {
@@ -305,20 +292,19 @@ export default function ActivityDashboard() {
     }
   };
 
-  const handleUpdateTaskGoal = async (taskId: string, newGoal: number, newGoalType: string) => {
-    const payload = { goal: newGoal, goalType: newGoalType };
-    console.log("handleUpdateTaskGoal payload:", payload);
+  const handleUpdateTaskGoal = async (
+    taskId: string,
+    newGoal: number,
+    newGoalType: string,
+  ) => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ goal: newGoal, goalType: newGoalType }),
       });
       const updatedTask = await res.json();
-      console.log("handleUpdateTaskGoal updatedTask:", updatedTask);
-      setAllTasks(prevTasks =>
-        prevTasks.map(task => (task._id === updatedTask._id ? updatedTask : task))
-      );
+      setAllTasks(prev => prev.map(t => (t._id === updatedTask._id ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error updating task goal:', err);
@@ -326,19 +312,14 @@ export default function ActivityDashboard() {
   };
 
   const handleUpdateTaskRounds = async (taskId: string, newRounds: number) => {
-    const payload = { rounds: newRounds };
-    console.log("handleUpdateTaskRounds payload:", payload);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ rounds: newRounds }),
       });
       const updatedTask = await res.json();
-      console.log("handleUpdateTaskRounds updatedTask:", updatedTask);
-      setAllTasks(prevTasks =>
-        prevTasks.map(task => (task._id === updatedTask._id ? updatedTask : task))
-      );
+      setAllTasks(prev => prev.map(t => (t._id === updatedTask._id ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error updating task rounds:', err);
@@ -347,15 +328,16 @@ export default function ActivityDashboard() {
 
   const handleAddDetailedNote = async (taskId: string, noteText: string) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}/detailed-notes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: noteText }),
-      });
-      const updatedTask = await res.json();
-      setAllTasks(prev =>
-        prev.map(task => (task._id === taskId ? updatedTask : task))
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}/detailed-notes`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: noteText }),
+        },
       );
+      const updatedTask = await res.json();
+      setAllTasks(prev => prev.map(t => (t._id === taskId ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error adding detailed note:', err);
@@ -364,14 +346,15 @@ export default function ActivityDashboard() {
 
   const handleStartTimer = async (taskId: string) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}/time-entry/start`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const updatedTask = await res.json();
-      setAllTasks(prev =>
-        prev.map(task => (task._id === taskId ? updatedTask : task))
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}/time-entry/start`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
+      const updatedTask = await res.json();
+      setAllTasks(prev => prev.map(t => (t._id === taskId ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error starting timer:', err);
@@ -380,14 +363,15 @@ export default function ActivityDashboard() {
 
   const handleStopTimer = async (taskId: string) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}/time-entry/stop`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const updatedTask = await res.json();
-      setAllTasks(prev =>
-        prev.map(task => (task._id === taskId ? updatedTask : task))
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/tasks/${taskId}/time-entry/stop`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
+      const updatedTask = await res.json();
+      setAllTasks(prev => prev.map(t => (t._id === taskId ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error stopping timer:', err);
@@ -402,25 +386,21 @@ export default function ActivityDashboard() {
         body: JSON.stringify({ projectId }),
       });
       const updatedTask = await res.json();
-      setAllTasks(prev =>
-        prev.map(task => (task._id === updatedTask._id ? updatedTask : task))
-      );
+      setAllTasks(prev => prev.map(t => (t._id === updatedTask._id ? updatedTask : t)));
       return updatedTask;
     } catch (err) {
       console.error('Error assigning task:', err);
     }
   };
 
-  // New function to handle activity deletion
+  // Delete activity
   const handleDeleteActivity = async (id: string) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setActivities(prev => prev.filter(act => act._id !== id));
-      } else {
-        const errText = await res.text();
-        throw new Error(errText);
-      }
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activities/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) setActivities(prev => prev.filter(act => act._id !== id));
+      else throw new Error(await res.text());
     } catch (err: any) {
       console.error('Error deleting activity:', err);
     }
@@ -429,41 +409,55 @@ export default function ActivityDashboard() {
   return (
     <div className="dashboard-container">
       <h1>Activity Dashboard</h1>
-      {/* Contextual Alerts using real tasks and pomodoro sessions */}
+
+      {/* Contextual Alerts */}
       <ContextualAlerts tasks={allTasks} pomodoroSessions={pomodoroSessions} />
+
       {/* Pomodoro Timer Widget */}
       <PomodoroWidget />
+
       <div className="add-activity">
         <button onClick={() => setShowAddActivityModal(true)}>New Activity</button>
       </div>
+
+      {/* Add-activity modal */}
       {showAddActivityModal && (
         <AddActivityModal
           onClose={() => setShowAddActivityModal(false)}
           onSubmit={handleAddActivity}
           onActivityAdded={(newActivity: any) => {
-            // In case the modal calls this callback, update state accordingly.
             newActivity.isLoading = false;
             setActivities(prev => [newActivity, ...prev]);
           }}
         />
       )}
+
+      {/* Activities with drag-and-drop */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="activitiesList">
-          {(provided) => (
-            <div className="activities-list" ref={provided.innerRef} {...provided.droppableProps}>
+          {provided => (
+            <div
+              className="activities-list"
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
               {activities.length === 0 ? (
                 <p>No activities found. Add a new activity to get started.</p>
               ) : (
                 activities.map((activity, index) => (
-                  <Draggable key={activity._id} draggableId={String(activity._id)} index={index}>
-                    {(provided) => (
+                  <Draggable
+                    key={activity._id}
+                    draggableId={String(activity._id)}
+                    index={index}
+                  >
+                    {provided => (
                       <div ref={provided.innerRef} {...provided.draggableProps}>
                         <ActivityCard
                           dragHandleProps={provided.dragHandleProps}
                           key={activity._id}
                           activity={activity}
                           onToggleStatus={handleToggleStatus}
-                          onDelete={handleDeleteActivity}  // Use handleDeleteActivity here instead of handleDeleteTask
+                          onDelete={handleDeleteActivity}
                           onEdit={handleEditTask}
                           onEditActivity={handleEditActivity}
                           onEditProject={handleEditProject}
