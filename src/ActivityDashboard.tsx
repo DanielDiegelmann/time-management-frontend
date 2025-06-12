@@ -457,7 +457,8 @@ export default function ActivityDashboard() {
                           key={activity._id}
                           activity={activity}
                           onToggleStatus={handleToggleStatus}
-                          onDelete={handleDeleteActivity}
+                          onDelete={handleDeleteTask}  // Assuming this is for tasks within activities
+                          onDeleteActivity={handleDeleteActivity}
                           onEdit={handleEditTask}
                           onEditActivity={handleEditActivity}
                           onEditProject={handleEditProject}

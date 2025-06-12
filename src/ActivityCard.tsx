@@ -105,6 +105,14 @@ export default function ActivityCard({
     await onEditActivity(activity._id, newTitle, newDescription);
   };
 
+  const handleDeleteActivityClick = () => {
+    if (onDeleteActivity) {
+      onDeleteActivity(activity._id);
+    } else {
+      console.warn('[ActivityCard] onDeleteActivity prop missing');
+    }
+  };
+
   const handleActivityDelete = async (activityId: string) => {
     if (window.confirm("Are you sure you want to delete this activity?")) {
       setError(''); // Reset error state before deletion
