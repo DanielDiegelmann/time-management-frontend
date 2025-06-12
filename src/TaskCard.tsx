@@ -161,6 +161,10 @@ export default function TaskCard({
   const [showGoalInput, setShowGoalInput] = useState(false);
   const [goalInput, setGoalInput] = useState(goal);
 
+  // New state for checklist items
+  const [checklistItems, setChecklistItems] = useState<{ id: string; text: string; completed: boolean }[]>([]);
+  const [newChecklistItem, setNewChecklistItem] = useState('');
+
   useEffect(() => {
     setGoalType(task.goalType !== undefined ? task.goalType : "Daily");
   }, [task.goalType]);
@@ -327,6 +331,37 @@ export default function TaskCard({
     } catch (error) {
       console.error("Error removing image:", error);
     }
+  };
+
+  // Handler to add new checklist item
+  const handleAddChecklistItem = () => {
+    if (newChecklistItem.trim()) {
+      const newItem = {
+        id: `item-${Date.now()}`,
+        text: newChecklistItem.trim(),
+        completed: false,
+      };
+      // Add new item and sort so that uncompleted items are on top.
+      const updatedList = [newItem, ...checklistItems].sort((a, b) => (a.completed === b.completed ? 0 : a.completed ? 1 : -1));
+      setChecklistItems(updatedList);
+      setNewChecklistItem('');
+    }
+  };
+
+  // Handler to toggle completion of a checklist item.
+  const handleToggleChecklistItem = (id: string) => {
+    const updatedList = checklistItems.map((item) =>
+      item.id === id ? { ...item, completed: !item.completed } : item
+    );
+    // Re-sort so that completed items move down
+    updatedList.sort((a, b) => (a.completed === b.completed ? 0 : a.completed ? 1 : -1));
+    setChecklistItems(updatedList);
+  };
+
+  // Handler to delete a checklist item.
+  const handleDeleteChecklistItem = (id: string) => {
+    const updatedList = checklistItems.filter(item => item.id !== id);
+    setChecklistItems(updatedList);
   };
 
   return (
@@ -551,6 +586,35 @@ export default function TaskCard({
           {showGoalHistory && (
             <GoalHistoryModal taskId={task._id} onClose={() => setShowGoalHistory(false)} />
           )}
+          {/* --- Begin Checklist Section --- */}
+          <div className="checklist-section">
+            <h4>Checklist</h4>
+            <div className="checklist-add">
+              <input 
+                type="text" 
+                placeholder="Add checklist item" 
+                value={newChecklistItem} 
+                onChange={(e) => setNewChecklistItem(e.target.value)} 
+              />
+              <button onClick={handleAddChecklistItem}>Add</button>
+            </div>
+            {checklistItems.length > 0 && (
+              <ul className="checklist-items">
+                {checklistItems.map((item) => (
+                  <li key={item.id} className={item.completed ? 'completed' : ''}>
+                    <input 
+                      type="checkbox" 
+                      checked={item.completed} 
+                      onChange={() => handleToggleChecklistItem(item.id)} 
+                    />
+                    <span>{item.text}</span>
+                    <button onClick={() => handleDeleteChecklistItem(item.id)}>Delete</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {/* --- End Checklist Section --- */}
           <div className="detailed-section">
             <h4>Detailed Notes</h4>
             <AddDetailedNoteForm taskId={task._id} onAdd={onAddDetailedNote} />
