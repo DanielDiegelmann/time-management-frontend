@@ -131,10 +131,11 @@
   
   .add-task button {
     margin: 0 auto 1.5rem auto;
+    width: 100%;
     padding: 0.8rem 1.6rem;
     background: #FFD500;
     border: none;
-    border-radius: 16px;
+    border-radius: 12px;
     color: #000000;
     font-size: 1rem;
     font-weight: bold;
@@ -143,7 +144,7 @@
 }
 
 .add-task button:hover {
-    background: linear-gradient(135deg, #218838, #1e7e34);
+    background: #D1AC00;
 }
 
   

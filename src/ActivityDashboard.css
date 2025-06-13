@@ -28,13 +28,14 @@
 /* Add Activity Button (Accent: Primary Yellow) */
 .add-activity button {
   display: block;
+  width: 100%;
   margin-left: auto;       /* Push button to the right */
   margin-right: 0;
   margin-bottom: 1.5rem;
   padding: 0.8rem 1.6rem;
   background: #FFD500;      /* Primary Yellow */
   border: none;
-  border-radius: 16px;      /* Rounded per general card guidelines */
+  border-radius: 12px;      /* Rounded per general card guidelines */
   color: #000000;           /* Black text on button for contrast */
   font-size: 1rem;
   font-weight: bold;

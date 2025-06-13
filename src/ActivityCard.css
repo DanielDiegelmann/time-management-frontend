@@ -147,10 +147,11 @@
 /* Additional Button example for adding projects if used */
 .add-project button {
   margin: 0 auto 1.5rem auto;
+  width: 100%;
   padding: 0.8rem 1.6rem;
   background: #FFD500;
   border: none;
-  border-radius: 16px;
+  border-radius: 12px;
   color: #000000;
   font-size: 1rem;
   font-weight: bold;
